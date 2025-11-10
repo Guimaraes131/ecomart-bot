@@ -3,6 +3,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from time import sleep
 from helpers import *
+from select_persona import *
 import os
 
 load_dotenv()
@@ -18,6 +19,7 @@ context = load("data/ecomart.txt")
 def bot(prompt):
   max_attempts = 1
   loop = 0
+  persona = personas[select_persona(prompt)]
 
   while True:
     try:
@@ -29,6 +31,11 @@ def bot(prompt):
 
         # Contexto
         {context}
+        
+        Você deve adotar a persona abaixo.
+        
+        # Persona
+        {persona}
       """
       
       response = client.responses.create(
