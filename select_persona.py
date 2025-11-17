@@ -1,11 +1,11 @@
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from time import sleep
 
 load_dotenv()
 
-client = openai.Client(os.getenv("OPEN_AI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPEN_AI_API_KEY"))
 model = "gpt-4.1-nano"
 
 personas = {
