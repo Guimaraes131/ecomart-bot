@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from time import sleep
 from helpers import *
 from select_persona import *
+from select_document import *
 import os
 
 load_dotenv()
@@ -14,12 +15,13 @@ model = "gpt-4.1-nano"
 app = Flask(__name__)
 app.secret_key = 'alura'
 
-context = load("data/ecomart.txt")
 
 def bot(prompt):
   max_attempts = 1
   loop = 0
   persona = personas[select_persona(prompt)]
+  context = select_context(prompt)
+  document = select_document(context)
 
   while True:
     try:
@@ -30,7 +32,7 @@ def bot(prompt):
         Você deve gerar respostas utilizando o contexto abaixo.
 
         # Contexto
-        {context}
+        {document}
         
         Você deve adotar a persona abaixo.
         
