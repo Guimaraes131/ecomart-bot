@@ -1,10 +1,11 @@
-from flask import Flask,render_template, request, Response
+from flask import Flask,render_template, request, session
 from openai import OpenAI
 from dotenv import load_dotenv
 from time import sleep
 from helpers import *
 from select_persona import *
 from select_document import *
+from ecomart_assistant import *
 import os
 
 load_dotenv()
@@ -15,42 +16,25 @@ model = "gpt-4.1-nano"
 app = Flask(__name__)
 app.secret_key = 'alura'
 
+conversation = create_conversation()
+
+
+def get_conv_id():
+  if "conversation_id" not in session:
+    session["conversation_id"] = conversation
+
+  return session["conversation_id"]
+
 
 def bot(prompt):
   max_attempts = 1
   loop = 0
-  persona = personas[select_persona(prompt)]
-  context = select_context(prompt)
-  document = select_document(context)
 
   while True:
     try:
-      instructions = f"""
-        Você é um chatbot de atendimento a clientes de um e-commerce.
-        Você não deve responder perguntas que não sejam dados do ecommerce informado!
-        
-        Você deve gerar respostas utilizando o contexto abaixo.
+      response = send_message(conversation, prompt)
 
-        # Contexto
-        {document}
-        
-        Você deve adotar a persona abaixo.
-        
-        # Persona
-        {persona}
-      """
-      
-      response = client.responses.create(
-        model=model,
-        instructions=instructions,
-        temperature=1,
-        max_output_tokens=256,
-        top_p=1,
-        input=[{"role":"user", "content":prompt}]
-      )
-      
-      return response
-      
+      return response.output_text
     except Exception as e:
       loop += 1
       if loop >= max_attempts:
