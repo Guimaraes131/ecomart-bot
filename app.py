@@ -1,4 +1,4 @@
-from flask import Flask,render_template, request, session
+from flask import Flask, render_template, request, session
 from openai import OpenAI
 from dotenv import load_dotenv
 from time import sleep
@@ -19,9 +19,9 @@ app.secret_key = 'alura'
 conversation = create_conversation()
 
 
-def get_conv_id():
+def get_conv_id(conv):
   if "conversation_id" not in session:
-    session["conversation_id"] = conversation
+    session["conversation_id"] = conv
 
   return session["conversation_id"]
 
@@ -32,9 +32,10 @@ def bot(prompt):
 
   while True:
     try:
-      response = send_message(conversation, prompt)
+      conv = get_conv_id(conversation)
+      response = send_message(conv, prompt)
 
-      return response.output_text
+      return response
     except Exception as e:
       loop += 1
       if loop >= max_attempts:
